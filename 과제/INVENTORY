@@ -1,0 +1,166 @@
+#ifndef INVENTORY_H
+#define INVENTORY_H
+
+#include <iostream>
+#include <algorithm>
+#include <string>
+
+using namespace std;
+
+// 기본 Item 클래스
+class Item {
+private:
+    string name_;
+    int price_;
+    
+public:
+    // 생성자
+    Item(const string& name = "", int price = 0) 
+        : name_(name), price_(price) {}
+    
+    // 정보 출력
+    void PrintInfo() const {
+        cout << "[이름: " << name_ << ", 가격: " << price_ << "G]" << endl;
+    }
+    
+    // Getter
+    int GetPrice() const { return price_; }
+    string GetName() const { return name_; }
+};
+
+// 템플릿 Inventory 클래스
+template <typename T>
+class Inventory {
+private:
+    T* pItems_;        // 아이템 배열 포인터
+    int capacity_;     // 최대 용량
+    int size_;        // 현재 아이템 개수
+    
+public:
+    // 생성자
+    Inventory(int capacity = 10) 
+        : capacity_(capacity > 0 ? capacity : 1), size_(0) {
+        pItems_ = new T[capacity_];
+        cout << "인벤토리 생성 (용량: " << capacity_ << ")" << endl;
+    }
+    
+    // 소멸자
+    ~Inventory() {
+        delete[] pItems_;
+        pItems_ = nullptr;
+        cout << "인벤토리 소멸" << endl;
+    }
+    
+    // 복사 생성자 (도전 기능)
+    Inventory(const Inventory<T>& other) 
+        : capacity_(other.capacity_), size_(other.size_) {
+        pItems_ = new T[capacity_];
+        for (int i = 0; i < size_; ++i) {
+            pItems_[i] = other.pItems_[i];
+        }
+        cout << "인벤토리 복사 완료" << endl;
+    }
+    
+    // 아이템 추가 (확장 기능 포함)
+    void AddItem(const T& item) {
+        if (size_ >= capacity_) {
+            // 도전 기능: 자동 확장
+            cout << "인벤토리가 꽉 찼습니다! 용량을 2배로 확장합니다." << endl;
+            Resize(capacity_ * 2);
+        }
+        
+        pItems_[size_] = item;
+        size_++;
+        cout << "아이템 추가 완료" << endl;
+    }
+    
+    // 마지막 아이템 제거
+    void RemoveLastItem() {
+        if (size_ > 0) {
+            size_--;
+            cout << "마지막 아이템 제거 완료" << endl;
+        } else {
+            cout << "인벤토리가 비어있습니다." << endl;
+        }
+    }
+    
+    // Getter 함수들
+    int GetSize() const { return size_; }
+    int GetCapacity() const { return capacity_; }
+    
+    // 모든 아이템 출력
+    void PrintAllItems() const {
+        cout << "\n=== 인벤토리 내용 (" << size_ << "/" << capacity_ << ") ===" << endl;
+        if (size_ == 0) {
+            cout << "(비어있음)" << endl;
+        } else {
+            for (int i = 0; i < size_; ++i) {
+                cout << i + 1 << ". ";
+                pItems_[i].PrintInfo();
+            }
+        }
+        cout << "===================" << endl;
+    }
+    
+    // 대입 함수 (도전 기능)
+    void Assign(const Inventory<T>& other) {
+        if (this != &other) {  // 자기 자신 대입 방지
+            // 기존 메모리 해제
+            delete[] pItems_;
+            
+            // 새로운 값 복사
+            capacity_ = other.capacity_;
+            size_ = other.size_;
+            pItems_ = new T[capacity_];
+            
+            for (int i = 0; i < size_; ++i) {
+                pItems_[i] = other.pItems_[i];
+            }
+            cout << "인벤토리 대입 완료" << endl;
+        }
+    }
+    
+    // 크기 변경 (도전 기능)
+    void Resize(int newCapacity) {
+        if (newCapacity <= 0) {
+            cout << "잘못된 용량입니다." << endl;
+            return;
+        }
+        
+        T* newItems = new T[newCapacity];
+        int itemsToCopy = (size_ < newCapacity) ? size_ : newCapacity;
+        
+        for (int i = 0; i < itemsToCopy; ++i) {
+            newItems[i] = pItems_[i];
+        }
+        
+        delete[] pItems_;
+        pItems_ = newItems;
+        capacity_ = newCapacity;
+        
+        if (size_ > capacity_) {
+            size_ = capacity_;
+        }
+        
+        cout << "인벤토리 크기 변경 완료 (새 용량: " << capacity_ << ")" << endl;
+    }
+    
+    // 아이템 정렬 (도전 기능)
+    void SortItems() {
+        if (size_ > 0) {
+            sort(pItems_, pItems_ + size_, 
+                [](const T& a, const T& b) {
+                    return a.GetPrice() < b.GetPrice();
+                });
+            cout << "아이템 가격순 정렬 완료" << endl;
+        }
+    }
+};
+
+// 비교 함수 (외부 정의)
+template <typename T>
+bool compareItemsByPrice(const T& a, const T& b) {
+    return a.GetPrice() < b.GetPrice();
+}
+
+#endif // INVENTORY_H
