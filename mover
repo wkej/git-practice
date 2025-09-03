@@ -1,0 +1,48 @@
+#include "CoordinateMover.h"
+
+ACoordinateMover::ACoordinateMover()
+{
+    PrimaryActorTick.bCanEverTick = false;
+    
+    // 시작 좌표 초기화
+    CurrentX = 0;
+    CurrentY = 0;
+}
+
+void ACoordinateMover::BeginPlay()
+{
+    Super::BeginPlay();
+    
+    UE_LOG(LogTemp, Warning, TEXT("=== 좌표 이동 프로그램 시작 ==="));
+    Move();
+}
+
+int32 ACoordinateMover::Step()
+{
+    // 0 또는 1을 랜덤으로 반환
+    return FMath::RandRange(0, 1);
+}
+
+void ACoordinateMover::Move()
+{
+    // 시작 좌표 출력
+    UE_LOG(LogTemp, Warning, TEXT("시작 좌표: (%d, %d)"), CurrentX, CurrentY);
+    
+    // 10회 이동
+    for (int32 i = 1; i <= 10; i++)
+    {
+        // 각 축에 대해 이동 거리 계산
+        int32 DeltaX = Step();
+        int32 DeltaY = Step();
+        
+        // 좌표 업데이트
+        CurrentX += DeltaX;
+        CurrentY += DeltaY;
+        
+        // 현재 좌표 출력
+        UE_LOG(LogTemp, Warning, TEXT("Step %d: 이동 거리 (%d, %d) -> 현재 좌표: (%d, %d)"), 
+            i, DeltaX, DeltaY, CurrentX, CurrentY);
+    }
+    
+    UE_LOG(LogTemp, Warning, TEXT("=== 이동 완료! 최종 좌표: (%d, %d) ==="), CurrentX, CurrentY);
+}
