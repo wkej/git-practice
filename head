@@ -1,0 +1,28 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "CoordinateMover.generated.h"
+
+UCLASS()
+class MYPROJECT_API ACoordinateMover : public AActor
+{
+    GENERATED_BODY()
+    
+public:    
+    ACoordinateMover();
+
+protected:
+    virtual void BeginPlay() override;
+
+private:
+    // 현재 좌표
+    int32 CurrentX;
+    int32 CurrentY;
+    
+    // 0 또는 1을 랜덤으로 반환
+    int32 Step();
+    
+    // 10회 이동하며 좌표 출력
+    void Move();
+};
